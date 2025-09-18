@@ -5,12 +5,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// VehicleRepository handles database operations
 type VehicleRepository struct {
 	db *sqlx.DB
 }
 
-// NewVehicleRepository creates new repository instance
 func NewVehicleRepository(db *sqlx.DB) *VehicleRepository {
 	return &VehicleRepository{db: db}
 }

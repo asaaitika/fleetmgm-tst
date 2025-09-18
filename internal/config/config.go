@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Config holds the application configuration
 type Config struct {
 	DBHost     string
 	DBPort     string

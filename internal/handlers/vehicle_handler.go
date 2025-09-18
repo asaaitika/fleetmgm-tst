@@ -7,12 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// VehicleHandler handles HTTP requests
 type VehicleHandler struct {
 	repo *repositories.VehicleRepository
 }
 
-// NewVehicleHandler creates new handler instance
 func NewVehicleHandler(repo *repositories.VehicleRepository) *VehicleHandler {
 	return &VehicleHandler{repo: repo}
 }

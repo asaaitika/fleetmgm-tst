@@ -15,11 +15,11 @@ func main() {
 
 	db, err := config.ConnectDB(cfg)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal("[API][DB][ERROR] >>> Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	log.Println("✅ Connected to PostgreSQL")
+	log.Println("[API][DB][INFO] >>> Connected to PostgreSQL")
 
 	vehicleRepo := repositories.NewVehicleRepository(db)
 
@@ -30,16 +30,15 @@ func main() {
 	router.GET("/vehicles/:vehicle_id/location", vehicleHandler.GetLastLocation)
 	router.GET("/vehicles/:vehicle_id/history", vehicleHandler.GetLocationHistory)
 
-	// Health check endpoint
+	// Check health
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "healthy"})
 	})
 
-	// Start server
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
-	log.Printf("🚀 API Server starting on %s", addr)
+	log.Printf("[API][APP][INFO] >>> API Server starting on %s", addr)
 
 	if err := router.Run(addr); err != nil {
-		log.Fatal("Failed to start server:", err)
+		log.Fatal("[API][APP][ERROR] >>> Failed to start server:", err)
 	}
 }
