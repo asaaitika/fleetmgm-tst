@@ -36,8 +36,8 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672"    # AMQP port
-      - "15672:15672"  # Management UI
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -46,8 +46,100 @@ services:
       timeout: 5s
       retries: 5
 
+  # Backend API Service
+  fleet-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api-server
+    container_name: fleet_api
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: fleet_admin
+      DB_PASSWORD: fleet_pass
+      DB_NAME: fleet_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fleet_network
+    restart: unless-stopped
+
+  # MQTT Subscriber Service
+  mqtt-subscriber:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: mqtt-subscriber
+    container_name: fleet_mqtt_subscriber
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: fleet_admin
+      DB_PASSWORD: fleet_pass
+      DB_NAME: fleet_db
+      MQTT_BROKER: tcp://mosquitto:1883
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    networks:
+      - fleet_network
+    restart: unless-stopped
+
+  # Geofence Worker Service
+  geofence-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: geofence-worker
+    container_name: fleet_geofence_worker
+    environment:
+      SERVICE_TYPE: geofence-worker
+      RABBITMQ_URL: amqp://rabbit_admin:rabbit_pass@rabbitmq:5672/
+      QUEUE_NAME: geofence_alerts
+      EXCHANGE_NAME: fleet.events
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fleet_network
+    restart: unless-stopped
+
+  # Mock GPS Publisher (untuk testing)
+  mock-publisher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: mock-publisher
+    container_name: fleet_mock_publisher
+    environment:
+      MQTT_BROKER: tcp://mosquitto:1883
+      PUBLISH_INTERVAL: 2s
+      VEHICLE_IDS: B1234XYZ,B5678ABC,B9012DEF
+    depends_on:
+      mosquitto:
+        condition: service_started
+    networks:
+      - fleet_network
+
 volumes:
   postgres_data:
   mosquitto_data:
   mosquitto_log:
   rabbitmq_data:
+
+networks:
+  fleet_network:
+    driver: bridge
