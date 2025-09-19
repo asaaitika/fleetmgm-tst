@@ -6,28 +6,18 @@ services:
       POSTGRES_DB: fleet_db
       POSTGRES_USER: fleet_admin
       POSTGRES_PASSWORD: fleet_pass
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     ports:
       - "5433:5432"
     volumes:
+      - ./internal/database/migrations.sql:/docker-entrypoint-initdb.d/01-init.sql
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fleet_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U fleet_admin -d fleet_db"]
       interval: 5s
       timeout: 5s
       retries: 5
-
-  mosquitto:
-    image: eclipse-mosquitto:2.0.18
-    container_name: fleet_mosquitto
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      # - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_log:/mosquitto/log
-    command: mosquitto -c /mosquitto-no-auth.conf 
 
   rabbitmq:
     image: rabbitmq:3.12-management-alpine
@@ -40,39 +30,49 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - fleet_network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Backend API Service
-  fleet-api:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.18
+    container_name: fleet_mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - fleet_network
+    command: mosquitto -c /mosquitto-no-auth.conf 
+
+  api:
     build:
       context: .
       dockerfile: Dockerfile
-      target: api-server
+      target: api
     container_name: fleet_api
+    ports:
+      - "8080:8080"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: fleet_admin
       DB_PASSWORD: fleet_pass
       DB_NAME: fleet_db
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       PORT: 8080
-    ports:
-      - "8080:8080"
     depends_on:
       postgres:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     networks:
       - fleet_network
     restart: unless-stopped
 
-  # MQTT Subscriber Service
   mqtt-subscriber:
     build:
       context: .
@@ -98,7 +98,6 @@ services:
       - fleet_network
     restart: unless-stopped
 
-  # Geofence Worker Service
   geofence-worker:
     build:
       context: .
@@ -106,10 +105,7 @@ services:
       target: geofence-worker
     container_name: fleet_geofence_worker
     environment:
-      SERVICE_TYPE: geofence-worker
-      RABBITMQ_URL: amqp://rabbit_admin:rabbit_pass@rabbitmq:5672/
-      QUEUE_NAME: geofence_alerts
-      EXCHANGE_NAME: fleet.events
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -117,7 +113,6 @@ services:
       - fleet_network
     restart: unless-stopped
 
-  # Mock GPS Publisher (untuk testing)
   mock-publisher:
     build:
       context: .
@@ -133,6 +128,8 @@ services:
         condition: service_started
     networks:
       - fleet_network
+    profiles:
+      - testing  # Only run when testing profile is active
 
 volumes:
   postgres_data:

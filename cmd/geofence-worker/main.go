@@ -92,16 +92,16 @@ func processMessage(msg amqp.Delivery) {
 
 	// Simulate processing
 	switch event.AreaName {
-	case "Halte Bundaran HI":
-		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> SMS Alert: Vehicle %s at Halte Bundaran HI", event.VehicleID)
-	case "Halte Blok M":
-		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Sending notification: Vehicle %s arrived at Halte Blok M", event.VehicleID)
-	case "Halte Cililitan (PGC)":
-		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Dashboard updated: Vehicle %s reached Halte Cililitan (PGC)", event.VehicleID)
-	case "Halte Cawang":
-		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Email Alert: Vehicle %s at Halte Cawang", event.VehicleID)
-	case "Halte Pulo Gadung":
-		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Push notification: Vehicle %s reached Halte Pulo Gadung", event.VehicleID)
+	case "Halte Pinang Ranti":
+		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Alert: Bus %s tiba di Halte Pinang Ranti (Terminal)", event.VehicleID)
+	case "Halte Cawang UKI":
+		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Alert: Bus %s melewati Halte Cawang UKI (Transit Point)", event.VehicleID)
+	case "Halte Pancoran Tugu":
+		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Alert: Bus %s di Halte Pancoran Tugu", event.VehicleID)
+	case "Halte Pertamburan":
+		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Alert: Bus %s tiba di Halte Pertamburan", event.VehicleID)
+	case "Halte Pluit":
+		log.Printf("[GEOFENCE-WORKER][MSG][INFO] >>> Alert: Bus %s mencapai Halte Pluit (Terminal)", event.VehicleID)
 	}
 
 	msg.Ack(false)

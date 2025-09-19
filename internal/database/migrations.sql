@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS geofence_areas (
 
 -- Insert sample geofence areas
 INSERT INTO geofence_areas (name, center_latitude, center_longitude, radius_meters) VALUES
-('Halte Bundaran HI', -6.1944, 106.8229, 50),
-('Halte Cililitan (PGC)', -6.2460, 106.8990, 50),
-('Halte Cawang', -6.2380, 106.8550, 50),
-('Halte Blok M', -6.2431, 106.8018, 50),
-('Halte Pulo Gadung', -6.1920, 106.8950, 50);
+('Halte Pinang Ranti', -6.2593, 106.8789, 50),
+('Halte Cawang UKI', -6.2426, 106.8585, 50),
+('Halte Pancoran Tugu', -6.2253, 106.8401, 50),
+('Halte Pertamburan', -6.1679, 106.8038, 50),
+('Halte Pluit', -6.1250, 106.7942, 50);

@@ -30,11 +30,16 @@ var simulationRoute = []struct {
 	Lon  float64
 	Name string
 }{
-	{-6.1944, 106.8229, "Halte Bundaran HI"},
-	{-6.2431, 106.8018, "Halte Blok M"},
-	{-6.2460, 106.8990, "Halte Cililitan (PGC)"},
-	{-6.2380, 106.8550, "Halte Cawang"},
-	{-6.1920, 106.8950, "Halte Pulo Gadung"},
+	{-6.2593, 106.8789, "Halte Pinang Ranti"},
+	{-6.2426, 106.8585, "Halte Cawang UKI"},
+	{-6.2253, 106.8401, "Halte Pancoran Tugu"},
+	{-6.1679, 106.8038, "Halte Pertamburan"},
+	{-6.1250, 106.7942, "Halte Pluit"},
+	// Rute Balik
+	{-6.1679, 106.8038, "Halte Pertamburan"},
+	{-6.2253, 106.8401, "Halte Pancoran Tugu"},
+	{-6.2426, 106.8585, "Halte Cawang UKI"},
+	{-6.2593, 106.8789, "Halte Pinang Ranti"},
 }
 
 func main() {

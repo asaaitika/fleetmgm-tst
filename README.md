@@ -1,28 +1,27 @@
 # 🚌 Fleet Tracking System
 
-Sistem tracking armada bus real-time untuk monitoring dan management fleet dengan teknologi modern.
+Real-time fleet tracking system untuk armada bus menggunakan MQTT, PostgreSQL, dan RabbitMQ.
+
+## 🚀 Tech Stack
+
+- **Backend**: Go (Golang) 1.25
+- **Database**: PostgreSQL 15
+- **Message Queue**: RabbitMQ 3.12
+- **MQTT Broker**: Eclipse Mosquitto 2.0
+- **API Framework**: Gin
+- **Container**: Docker & Docker Compose
 
 ## 🏗️ Arsitektur Sistem
 
 ```
-[GPS Device] → [MQTT Broker] → [Backend Services] → [PostgreSQL]
-                     ↓                ↓
-               [Mock Publisher]  [RabbitMQ] → [Geofence Worker]
-                     ↓                ↓
-               [Real-time Data]  [Alert System]
+[GPS Device] → [MQTT Broker] → [Subscriber Service] → [PostgreSQL]
+↓
+[Geofence Check]
+↓
+[RabbitMQ] → [Alert Worker]
 ```
 
-## 🛠️ Tech Stack
-
-- **Backend**: Go (Gin Framework)
-- **Database**: PostgreSQL 15
-- **Message Brokers**: 
-  - Eclipse Mosquitto (MQTT)
-  - RabbitMQ (Event Processing)
-- **Containerization**: Docker & Docker Compose
-- **API**: RESTful API + Real-time MQTT
-
-## 📋 Features Lengkap
+## 📋 Features
 
 - ✅ **Real-time GPS tracking** (interval 2 detik)
 - ✅ **MQTT Integration** untuk IoT devices
@@ -31,36 +30,33 @@ Sistem tracking armada bus real-time untuk monitoring dan management fleet denga
 - ✅ **Historical location data** storage
 - ✅ **RESTful API endpoints** lengkap
 - ✅ **Multi-service architecture** dengan Docker
-- ✅ **Auto-scaling ready** dengan container orchestration
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Docker & Docker Compose
+- Go 1.25+ (untuk development)
+- Make (optional)
 
+### Installation & Running
+
+1. **Clone repository**
 ```bash
-# Pastikan Docker & Docker Compose terinstall
-docker --version          # Docker version 20.10+
-docker-compose --version  # Docker Compose version 2.0+
+git clone https://github.com/asaaitika/fleetmgm-tst.git
+cd fleetmgm-tst
 ```
 
-### 1. Setup Project
-
+2. **Start all services**
 ```bash
-# Clone dan masuk ke direktori project
-cd fleet-tracking-system
-```
-
-### 2. Build & Start All Services
-
-```bash
-# Build dan start semua services sekaligus
+# Build & start all services
 docker-compose up --build
 
-# Atau run di background
+# or run di background
 docker-compose up --build -d
-
-# Monitor logs
-docker-compose logs -f
+```
+3. **Run mock GPS publisher (testing)**
+```bash
+docker-compose --profile testing up -d
 ```
 
 ## 🔧 Development Mode
