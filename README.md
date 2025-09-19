@@ -54,7 +54,33 @@ docker-compose up --build
 # or run di background
 docker-compose up --build -d
 ```
-3. **Run mock GPS publisher (testing)**
+
+3. **Database Migration**
+
+### Automatic Migration (Docker)
+Migration otomatis dijalankan saat container PostgreSQL start pertama kali.
+
+### Manual Migration
+Jika perlu run migration manual atau reset database:
+```bash
+# Connect ke database
+docker exec -it fleet_postgres psql -U fleet_admin -d fleet_db
+
+# Drop existing tables (CAUTION: Hapus semua data)
+DROP TABLE IF EXISTS vehicle_locations CASCADE;
+DROP TABLE IF EXISTS geofence_areas CASCADE;
+
+# Exit psql
+\q
+
+# Run migration file
+docker exec -it fleet_postgres psql -U fleet_admin -d fleet_db -f /docker-entrypoint-initdb.d/01-init.sql
+
+# Verify tables created
+docker exec -it fleet_postgres psql -U fleet_admin -d fleet_db -c "\dt"
+```
+
+4. **Run mock GPS publisher (testing)**
 ```bash
 docker-compose --profile testing up -d
 ```
